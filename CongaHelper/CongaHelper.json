@@ -1,0 +1,11 @@
+{
+  "Author": "Aly",
+  "Name": "Conga Helper",
+  "Punchline": "Automatically rearrange party list for TOP.",
+  "Description": "Rearrange party list from left to right: /conga",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "TOP",
+    "party"
+  ]
+}
