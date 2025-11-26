@@ -30,7 +30,7 @@ public sealed class Conga
         this.playerState = playerState;
     }
 
-    private IGameObject[]? Buddies()
+    private IGameObject[]? PartyMembers()
     {
         unsafe
         {
@@ -70,25 +70,6 @@ public sealed class Conga
             return gameObjects;
         }
     }
-
-    private IGameObject[]? PartyMembers()
-    {
-        IGameObject[] gameObjects = new IGameObject[partyList.Length];
-        for (int i = 0; i < partyList.Length; i++)
-        {
-            IGameObject? gameObject = partyList[i]?.GameObject;
-            if (gameObject != null)
-            {
-                gameObjects[i] = gameObject;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        return gameObjects;
-    }
     
     public void DoConga()
     {
@@ -98,10 +79,6 @@ public sealed class Conga
         if (PartyMembers() is { Length: > 0 } partyMembers)
         {
             byIndex = partyMembers;
-        }
-        else if(Buddies() is { Length: > 0 } buddies)
-        {
-            byIndex = buddies;
         }
         else
         {
