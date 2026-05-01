@@ -2,13 +2,15 @@
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using CongaHelper.Windows;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 
 namespace CongaHelper;
 
-public sealed class Plugin : IDalamudPlugin
+public sealed class Plugin : IAsyncDalamudPlugin
 {
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
@@ -22,13 +24,12 @@ public sealed class Plugin : IDalamudPlugin
     private const string CommandName = "/conga";
 
     public readonly WindowSystem WindowSystem = new("CongaHelper");
-    private MainWindow MainWindow { get; init; }
-    private Conga Conga { get; init; }
+    private MainWindow MainWindow { get; set; }
+    private Conga Conga { get; set; }
 
-    public Plugin()
+    public Task LoadAsync(CancellationToken cancellationToken)
     {
         Conga = new Conga(ClientState, GameGui, ObjectTable, PartyList, PlayerState);
-        
         MainWindow = new MainWindow(this, Conga, GameGui);
 
         WindowSystem.AddWindow(MainWindow);
@@ -40,9 +41,11 @@ public sealed class Plugin : IDalamudPlugin
 
         // Tell the UI system that we want our windows to be drawn through the window system
         PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
+        
+        return Task.CompletedTask;
     }
-
-    public void Dispose()
+    
+    public ValueTask DisposeAsync()
     {
         // Unregister all actions to not leak anythign during disposal of plugin
         PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
@@ -52,6 +55,8 @@ public sealed class Plugin : IDalamudPlugin
         MainWindow.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
+
+        return ValueTask.CompletedTask;
     }
 
     private void OnCommand(string command, string args)
